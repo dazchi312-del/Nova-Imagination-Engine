@@ -12,13 +12,15 @@ class MemoryAwareRouter:
         required_capability = task["capability"]
         context = task.get("context", {})
 
-        if isinstance(context, dict) and context: 
+        if isinstance(context, dict) and context:
             print("Using memory context for routing")
 
             preferred_agent = context.get("preferred_agent")
             if preferred_agent:
                 if preferred_agent in self.agents:
-                    if required_capability in self.agents[preferred_agent].get("capabilities", []):
+                    if required_capability in self.agents[preferred_agent].get(
+                        "capabilities", []
+                    ):
                         return preferred_agent
 
             previous_capability = context.get("capability")

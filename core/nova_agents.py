@@ -59,6 +59,7 @@ def setup_file_logging(log_dir: Path) -> None:
 # CONFIGURATION
 # ============================================================
 
+
 @dataclass
 class Config:
     base_url: str = "http://localhost:1234/v1/chat/completions"
@@ -71,9 +72,7 @@ class Config:
     max_tokens: int = 768
     top_p: float = 0.9
     repeat_penalty: float = 1.15
-    stop_sequences: list[str] = field(
-        default_factory=lambda: ["User:", "\n\nUser"]
-    )
+    stop_sequences: list[str] = field(default_factory=lambda: ["User:", "\n\nUser"])
     memory_max_conversations: int = 500
     memory_max_facts: int = 100
     memory_max_agent_runs: int = 50
@@ -93,9 +92,7 @@ class Config:
             return cls()
 
     def save(self, path: Path) -> None:
-        path.write_text(
-            json.dumps(asdict(self), indent=2), encoding="utf-8"
-        )
+        path.write_text(json.dumps(asdict(self), indent=2), encoding="utf-8")
 
 
 # ============================================================
@@ -221,6 +218,7 @@ AGENTS: dict[str, dict[str, Any]] = {
 # UTILITIES
 # ============================================================
 
+
 def utc_now() -> str:
     return datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
 
@@ -265,6 +263,7 @@ def format_duration(seconds: float) -> str:
 # ============================================================
 # MEMORY ENGINE
 # ============================================================
+
 
 class Memory:
     def __init__(self, filepath: Path, config: Config) -> None:
@@ -358,23 +357,27 @@ class Memory:
             if existing["fact"].lower().strip() == fact.lower().strip():
                 logger.debug("Duplicate fact skipped: %s", fact[:50])
                 return
-        self.data["facts"].append({
-            "id": short_id(),
-            "fact": fact.strip(),
-            "source": source,
-            "timestamp": utc_now(),
-        })
+        self.data["facts"].append(
+            {
+                "id": short_id(),
+                "fact": fact.strip(),
+                "source": source,
+                "timestamp": utc_now(),
+            }
+        )
         self._prune()
         self.save()
 
     def store_agent_run(self, pipeline: str, meta: dict[str, Any]) -> None:
-        self.data["agent_runs"].append({
-            "id": short_id(),
-            "session": self.session_id,
-            "pipeline": pipeline,
-            "timestamp": utc_now(),
-            "meta": meta,
-        })
+        self.data["agent_runs"].append(
+            {
+                "id": short_id(),
+                "session": self.session_id,
+                "pipeline": pipeline,
+                "timestamp": utc_now(),
+                "meta": meta,
+            }
+        )
         self._prune()
         self.save()
 
@@ -387,9 +390,9 @@ class Memory:
     def search(self, keyword: str) -> list[dict[str, Any]]:
         kw = keyword.lower()
         return [
-            c for c in self.data["conversations"]
-            if kw in c.get("user", "").lower()
-            or kw in c.get("response", "").lower()
+            c
+            for c in self.data["conversations"]
+            if kw in c.get("user", "").lower() or kw in c.get("response", "").lower()
         ]
 
     def get_context_for_agent(self, max_recent: int = 3) -> str:
@@ -440,6 +443,7 @@ class Memory:
 # ============================================================
 # LLM CONNECTION
 # ============================================================
+
 
 class LLMClient:
     def __init__(self, config: Config) -> None:
@@ -517,13 +521,15 @@ class LLMClient:
                 last_error = e
                 logger.warning(
                     "Connection failed (attempt %d/%d)",
-                    attempt, self.config.max_retries,
+                    attempt,
+                    self.config.max_retries,
                 )
             except httpx.TimeoutException as e:
                 last_error = e
                 logger.warning(
                     "Timeout (attempt %d/%d)",
-                    attempt, self.config.max_retries,
+                    attempt,
+                    self.config.max_retries,
                 )
             except httpx.HTTPStatusError as e:
                 raise RuntimeError(
@@ -548,10 +554,9 @@ class LLMClient:
 # AGENT RUNNER
 # ============================================================
 
+
 class AgentRunner:
-    def __init__(
-        self, llm: LLMClient, memory: Memory, config: Config
-    ) -> None:
+    def __init__(self, llm: LLMClient, memory: Memory, config: Config) -> None:
         self.llm = llm
         self.memory = memory
         self.config = config
@@ -574,9 +579,7 @@ class AgentRunner:
         context_parts: list[str] = []
 
         if extra_context.strip():
-            context_parts.append(
-                f"PREVIOUS AGENT OUTPUT:\n{extra_context.strip()}"
-            )
+            context_parts.append(f"PREVIOUS AGENT OUTPUT:\n{extra_context.strip()}")
 
         mem_context = self.memory.get_context_for_agent()
         if mem_context:
@@ -589,7 +592,9 @@ class AgentRunner:
 
         logger.debug(
             "Calling %s | temp=%.1f | input_len=%d",
-            agent["name"], agent["temperature"], len(full_message),
+            agent["name"],
+            agent["temperature"],
+            len(full_message),
         )
 
         reply, elapsed = self.llm.call(
@@ -619,8 +624,10 @@ class AgentRunner:
 
         logger.debug(
             "%s responded in %.1fs | valid=%s | score=%.0f%%",
-            agent["name"], elapsed,
-            validation["valid"], validation["score"] * 100,
+            agent["name"],
+            elapsed,
+            validation["valid"],
+            validation["score"] * 100,
         )
 
         return reply, elapsed, validation
@@ -629,6 +636,7 @@ class AgentRunner:
 # ============================================================
 # PIPELINES
 # ============================================================
+
 
 class PipelineRunner:
     def __init__(self, runner: AgentRunner, memory: Memory) -> None:
@@ -649,10 +657,7 @@ class PipelineRunner:
         label: str,
     ) -> None:
         agent = AGENTS[agent_key]
-        print(
-            f"\n  [{num}/{total}] "
-            f"{agent['emoji']} {agent['name']} — {label}"
-        )
+        print(f"\n  [{num}/{total}] " f"{agent['emoji']} {agent['name']} — {label}")
         print(f"  {'─' * 50}")
 
     def _show_result(self, reply: str, elapsed: float, val: dict) -> None:
@@ -661,9 +666,7 @@ class PipelineRunner:
         status = "✅" if val["valid"] else "⚠️"
         print(f"\n  ⏱️ {format_duration(elapsed)} | {status} {compliance}")
 
-    def full(
-        self, query: str, topic: str | None = None
-    ) -> dict[str, Any]:
+    def full(self, query: str, topic: str | None = None) -> dict[str, Any]:
         self._header("🚀 FULL PIPELINE — 4 Agents", query)
         t_start = time.time()
 
@@ -725,22 +728,23 @@ class PipelineRunner:
 
         total_time = time.time() - t_start
 
-        self.memory.store_agent_run("full", {
-            "query": query,
-            "topic": topic,
-            "timings": timings,
-            "validations": {
-                k: {"score": vv["score"], "valid": vv["valid"]}
-                for k, vv in validations.items()
+        self.memory.store_agent_run(
+            "full",
+            {
+                "query": query,
+                "topic": topic,
+                "timings": timings,
+                "validations": {
+                    k: {"score": vv["score"], "valid": vv["valid"]}
+                    for k, vv in validations.items()
+                },
+                "total_time": round(total_time, 1),
             },
-            "total_time": round(total_time, 1),
-        })
+        )
 
         print(f"\n{'═' * 62}")
         print(f"  ✅ PIPELINE COMPLETE — {format_duration(total_time)} total")
-        avg_score = sum(
-            vv["score"] for vv in validations.values()
-        ) / len(validations)
+        avg_score = sum(vv["score"] for vv in validations.values()) / len(validations)
         print(f"  📊 Average compliance: {avg_score * 100:.0f}%")
         print(f"{'═' * 62}\n")
 
@@ -751,16 +755,12 @@ class PipelineRunner:
             "total_time": total_time,
         }
 
-    def quick(
-        self, query: str, topic: str | None = None
-    ) -> dict[str, Any]:
+    def quick(self, query: str, topic: str | None = None) -> dict[str, Any]:
         self._header("⚡ QUICK PIPELINE — NOVA + CRITIC", query)
         t_start = time.time()
 
         self._stage(1, 2, "nova", "Analyzing...")
-        nova_r, nova_t, nova_v = self.runner.call(
-            "nova", query, topic=topic
-        )
+        nova_r, nova_t, nova_v = self.runner.call("nova", query, topic=topic)
         self._show_result(nova_r, nova_t, nova_v)
 
         self._stage(2, 2, "critic", "Reviewing...")
@@ -774,11 +774,14 @@ class PipelineRunner:
 
         total_time = time.time() - t_start
 
-        self.memory.store_agent_run("quick", {
-            "query": query,
-            "topic": topic,
-            "total_time": round(total_time, 1),
-        })
+        self.memory.store_agent_run(
+            "quick",
+            {
+                "query": query,
+                "topic": topic,
+                "total_time": round(total_time, 1),
+            },
+        )
 
         print(f"\n{'═' * 62}")
         print(f"  ✅ QUICK COMPLETE — {format_duration(total_time)} total")
@@ -790,9 +793,7 @@ class PipelineRunner:
             "total_time": total_time,
         }
 
-    def deep(
-        self, query: str, topic: str | None = None
-    ) -> dict[str, Any]:
+    def deep(self, query: str, topic: str | None = None) -> dict[str, Any]:
         """NOVA → ARCHITECT → EXECUTOR — no critique, just build."""
         self._header("🏗️ DEEP BUILD — 3 Agents", query)
         t_start = time.time()
@@ -826,9 +827,13 @@ class PipelineRunner:
 
         total_time = time.time() - t_start
 
-        self.memory.store_agent_run("deep", {
-            "query": query, "total_time": round(total_time, 1),
-        })
+        self.memory.store_agent_run(
+            "deep",
+            {
+                "query": query,
+                "total_time": round(total_time, 1),
+            },
+        )
 
         print(f"\n{'═' * 62}")
         print(f"  ✅ DEEP BUILD COMPLETE — {format_duration(total_time)}")
@@ -840,6 +845,7 @@ class PipelineRunner:
 # ============================================================
 # TEST SUITE
 # ============================================================
+
 
 class TestRunner:
     def __init__(self, runner: AgentRunner) -> None:
@@ -861,24 +867,22 @@ class TestRunner:
 
         for i, prompt in enumerate(prompts, 1):
             print(f"\n  Test {i}/{len(prompts)}: {prompt}")
-            reply, elapsed, val = self.runner.call(
-                "nova", prompt, silent=True
-            )
+            reply, elapsed, val = self.runner.call("nova", prompt, silent=True)
             status = "✅ PASS" if val["valid"] else "❌ FAIL"
-            missing = (
-                f" (missing: {val['missing']})" if val["missing"] else ""
-            )
+            missing = f" (missing: {val['missing']})" if val["missing"] else ""
             print(
                 f"  {status} | "
                 f"{val['score']*100:.0f}% compliance | "
                 f"{format_duration(elapsed)}{missing}"
             )
-            results.append({
-                "prompt": prompt,
-                "valid": val["valid"],
-                "score": val["score"],
-                "elapsed": elapsed,
-            })
+            results.append(
+                {
+                    "prompt": prompt,
+                    "valid": val["valid"],
+                    "score": val["score"],
+                    "elapsed": elapsed,
+                }
+            )
 
         passed = sum(1 for r in results if r["valid"])
         total = len(results)
@@ -915,9 +919,7 @@ class TestRunner:
             agent = AGENTS[agent_key]
             print(f"\n  {agent['emoji']} {agent['name']}: {prompt[:50]}...")
             try:
-                reply, elapsed, val = self.runner.call(
-                    agent_key, prompt, silent=True
-                )
+                reply, elapsed, val = self.runner.call(agent_key, prompt, silent=True)
                 status = "✅" if val["valid"] else "⚠️"
                 print(
                     f"  {status} {val['score']*100:.0f}% | "
@@ -936,6 +938,7 @@ class TestRunner:
 # EXPORT
 # ============================================================
 
+
 def export_last_run(memory: Memory, export_dir: Path) -> Path | None:
     runs = memory.data.get("agent_runs", [])
     if not runs:
@@ -952,6 +955,7 @@ def export_last_run(memory: Memory, export_dir: Path) -> Path | None:
 # ============================================================
 # CLI
 # ============================================================
+
 
 class CLI:
     def __init__(
@@ -989,7 +993,8 @@ class CLI:
         print(f"{'═' * 62}\n")
 
     def help(self) -> None:
-        print("""
+        print(
+            """
 ╔═══════════════════════════════════════════════════════════╗
 ║  NOVA COMMANDS                                            ║
 ╠═══════════════════════════════════════════════════════════╣
@@ -1024,7 +1029,8 @@ class CLI:
 ║    <any text>           Routes to NOVA automatically      ║
 ║                                                           ║
 ╚═══════════════════════════════════════════════════════════╝
-        """)
+        """
+        )
 
     def status(self) -> None:
         print(f"\n{'─' * 50}")
@@ -1118,16 +1124,13 @@ class CLI:
         topic = extract_topic(query)
         print(f"\n  {agent['emoji']} {agent['name']} processing...\n")
 
-        reply, elapsed, val = self.runner.call(
-            agent_key, query, topic=topic
-        )
+        reply, elapsed, val = self.runner.call(agent_key, query, topic=topic)
 
         print(reply)
         compliance = f"{val['score']*100:.0f}%"
         status = "✅" if val["valid"] else "⚠️"
         print(
-            f"\n  ⏱️ {format_duration(elapsed)} | "
-            f"{status} {compliance} compliance\n"
+            f"\n  ⏱️ {format_duration(elapsed)} | " f"{status} {compliance} compliance\n"
         )
 
     def handle(self, raw: str) -> None:
@@ -1231,8 +1234,7 @@ class CLI:
         compliance = f"{val['score']*100:.0f}%"
         status = "✅" if val["valid"] else "⚠️"
         print(
-            f"\n  ⏱️ {format_duration(elapsed)} | "
-            f"{status} {compliance} compliance\n"
+            f"\n  ⏱️ {format_duration(elapsed)} | " f"{status} {compliance} compliance\n"
         )
 
     def run(self) -> None:
@@ -1259,6 +1261,7 @@ class CLI:
 # ============================================================
 # ENTRY POINT
 # ============================================================
+
 
 def main() -> None:
     # Load config

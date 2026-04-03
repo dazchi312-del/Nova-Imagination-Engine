@@ -89,9 +89,9 @@ def chat(
 ) -> str:
     """Send a message to the model with full conversation history."""
 
-    messages = [build_system_message()] + history + [
-        {"role": "user", "content": message}
-    ]
+    messages = (
+        [build_system_message()] + history + [{"role": "user", "content": message}]
+    )
 
     payload = {
         "model": model,
@@ -112,9 +112,7 @@ def chat(
             "Request timed out. The model may be overloaded or too large."
         )
     except httpx.HTTPStatusError as e:
-        raise RuntimeError(
-            f"API error {e.response.status_code}: {e.response.text}"
-        )
+        raise RuntimeError(f"API error {e.response.status_code}: {e.response.text}")
 
     try:
         data = response.json()
@@ -151,9 +149,7 @@ def validate_config() -> bool:
 def check_connection() -> bool:
     """Verify LM Studio is reachable before starting chat."""
     try:
-        response = httpx.get(
-            f"{LM_STUDIO_BASE_URL}/v1/models", timeout=10.0
-        )
+        response = httpx.get(f"{LM_STUDIO_BASE_URL}/v1/models", timeout=10.0)
         response.raise_for_status()
         models = response.json()
         available = [m["id"] for m in models.get("data", [])]
@@ -290,8 +286,10 @@ def run_validation(history: list[Message]) -> None:
             results.append(result)
 
             status = "✅ PASS" if result["pass"] else "❌ FAIL"
-            print(f"\r  Test {i}/4: {status} "
-                  f"({result['sections_found']}/{result['sections_total']} sections)")
+            print(
+                f"\r  Test {i}/4: {status} "
+                f"({result['sections_found']}/{result['sections_total']} sections)"
+            )
 
             if result["missing"]:
                 print(f"           Missing: {', '.join(result['missing'])}")
@@ -301,8 +299,14 @@ def run_validation(history: list[Message]) -> None:
 
         except Exception as e:
             print(f"\r  Test {i}/4: ⚠️ ERROR — {e}")
-            results.append({"pass": False, "sections_found": 0,
-                            "sections_total": 5, "missing": REQUIRED_SECTIONS})
+            results.append(
+                {
+                    "pass": False,
+                    "sections_found": 0,
+                    "sections_total": 5,
+                    "missing": REQUIRED_SECTIONS,
+                }
+            )
 
     # Summary
     passed = sum(1 for r in results if r["pass"])
@@ -333,4 +337,3 @@ def run_validation(history: list[Message]) -> None:
 
 if __name__ == "__main__":
     main()
-

@@ -2,16 +2,13 @@ import sys
 import os
 import uuid
 
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
 from core.router import MemoryAwareRouter
 from core.memory import Memory
 from core.agents import Agent
 
-agents = {
-    "agent1": {"capabilities": ["text"]},
-    "agent2": {"capabilities": ["image"]}
-}
+agents = {"agent1": {"capabilities": ["text"]}, "agent2": {"capabilities": ["image"]}}
 
 router = MemoryAwareRouter(agents)
 memory = Memory()
@@ -23,11 +20,13 @@ last_session = memory.get_last_session()
 
 if last_session:
     print("\n--- CONTEXT LOADED ---")
-    print({
-    "session_id": last_session.get("session_id"),
-    "capability": last_session.get("capability"),
-    "id": last_session.get("id"),
-})
+    print(
+        {
+            "session_id": last_session.get("session_id"),
+            "capability": last_session.get("capability"),
+            "id": last_session.get("id"),
+        }
+    )
 
 # Attach context to task (clean all nesting)
 while isinstance(last_session, dict) and "context" in last_session:
@@ -37,8 +36,8 @@ task["context"] = last_session
 
 task["context"] = last_session
 
-task["context"] = last_session    
-    
+task["context"] = last_session
+
 agent_id = router.route(task)
 memory.save(task["id"], task)
 
