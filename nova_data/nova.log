@@ -1,0 +1,13 @@
+2026-03-30 01:53:19,447 [INFO] nova: NOVA v2.0.0 starting | model=llama-3.1-8b-instruct
+2026-03-30 01:53:21,711 [INFO] nova: Connected — models: ['llama-3.1-8b-instruct', 'text-embedding-nomic-embed-text-v1.5']
+2026-03-30 01:53:29,674 [DEBUG] nova: Calling NOVA | temp=0.2 | input_len=26
+2026-03-30 01:53:34,226 [DEBUG] nova: NOVA responded in 4.5s | valid=True | score=100%
+2026-03-30 01:53:34,227 [DEBUG] nova: Calling NOVA | temp=0.2 | input_len=82
+2026-03-30 01:53:36,451 [DEBUG] nova: NOVA responded in 2.2s | valid=True | score=100%
+2026-03-30 01:53:36,451 [DEBUG] nova: Calling NOVA | temp=0.2 | input_len=108
+2026-03-30 01:53:38,789 [DEBUG] nova: NOVA responded in 2.3s | valid=True | score=100%
+2026-03-30 01:53:38,789 [DEBUG] nova: Calling NOVA | temp=0.2 | input_len=145
+2026-03-30 01:53:41,561 [DEBUG] nova: NOVA responded in 2.8s | valid=True | score=100%
+2026-03-30 01:53:50,782 [DEBUG] nova: Calling NOVA | temp=0.2 | input_len=128
+2026-03-30 01:53:55,439 [DEBUG] nova: NOVA responded in 4.7s | valid=True | score=100%
+2026-03-30 01:54:12,975 [INFO] nova: Session ended

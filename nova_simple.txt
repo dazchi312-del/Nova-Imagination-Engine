@@ -1,0 +1,36 @@
+mport httpx
+
+LM_STUDIO_URL = "http://localhost:1234/api/v1/chat"
+
+def chat_with_nova(message: str) -> str:
+    payload = {
+        "messages": [
+            {"role": "system", "content": "You are Nova, a private local AI assistant. Be clear, helpful, and concise."},
+            {"role": "user", "content": message}
+        ],
+        "temperature": 0.7,
+        "stream": False
+    }
+
+    response = httpx.post(LM_STUDIO_URL, json=payload, timeout=120)
+    response.raise_for_status()
+    data = response.json()
+    return data["choices"][0]["message"]["content"]
+
+def main():
+    print("Nova local chat started. Type 'exit' to quit.\n")
+
+    while True:
+        user_input = input("You: ").strip()
+        if user_input.lower() in {"exit", "quit"}:
+            print("Nova session ended.")
+            break
+
+        try:
+            reply = chat_with_nova(user_input)
+            print(f"\nNova: {reply}\n")
+        except Exception as e:
+            print(f"\nError: {e}\n")
+
+if __name__ == "__main__":
+    main()
