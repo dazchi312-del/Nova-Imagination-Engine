@@ -1,49 +1,34 @@
-from typing import Dict
-import uuid
 import json
-import ast
+from typing import Dict, List
 from db.db import get_connection
 
 
 class Memory:
     def __init__(self):
-        self.store: Dict[str, Dict] = {}
+        pass
 
-    def save(self, task_id: str, data: Dict):
-        self.store[task_id] = data
-
+    def save(self, key: str, data: Dict):
         conn = get_connection()
         cursor = conn.cursor()
 
         cursor.execute(
             """
-            INSERT INTO creative_sessions (session_id, base_prompt)
+            INSERT OR REPLACE INTO memory_entries (key, value)
             VALUES (?, ?)
             """,
-            (task_id, json.dumps(data)),
+            (key, json.dumps(data)),
         )
 
         conn.commit()
         conn.close()
 
-    def _parse_payload(self, payload):
-        try:
-            return json.loads(payload)
-        except json.JSONDecodeError:
-            return ast.literal_eval(payload)
-
-    def load(self, task_id: str) -> Dict:
-        # First check in-memory
-        if task_id in self.store:
-            return self.store[task_id]
-
-        # Fallback to database
+    def load(self, key: str) -> Dict:
         conn = get_connection()
         cursor = conn.cursor()
 
         cursor.execute(
-            "SELECT base_prompt FROM creative_sessions WHERE session_id = ?",
-            (task_id,),
+            "SELECT value FROM memory_entries WHERE key = ?",
+            (key,),
         )
 
         row = cursor.fetchone()
@@ -54,31 +39,24 @@ class Memory:
 
         return {}
 
-    def list_sessions(self):
+    def list_keys(self) -> List[str]:
         conn = get_connection()
         cursor = conn.cursor()
 
-        cursor.execute(
-            "SELECT session_id, base_prompt FROM creative_sessions ORDER BY timestamp DESC"
-        )
-
+        cursor.execute("SELECT key FROM memory_entries")
         rows = cursor.fetchall()
         conn.close()
 
-        return [{"session_id": row[0], **self._parse_payload(row[1])} for row in rows]
+        return [row[0] for row in rows]
 
-    def get_last_session(self):
+    def delete(self, key: str):
         conn = get_connection()
         cursor = conn.cursor()
 
         cursor.execute(
-            "SELECT session_id, base_prompt FROM creative_sessions ORDER BY timestamp DESC LIMIT 1"
+            "DELETE FROM memory_entries WHERE key = ?",
+            (key,),
         )
 
-        row = cursor.fetchone()
+        conn.commit()
         conn.close()
-
-        if row:
-            return {"session_id": row[0], **self._parse_payload(row[1])}
-
-        return {}

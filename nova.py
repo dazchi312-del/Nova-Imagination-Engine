@@ -1,50 +1,66 @@
-import json
+import os
+from openai import OpenAI
+from core.memory import Memory
 
-from core.ai_engine import AIEngine, AIEngineError
-from core.openai_engine import OpenAIEngine, OpenAIEngineError
+# 1. Point directly to your local LM Studio server
+client = OpenAI(
+    base_url="http://localhost:1234/v1", 
+    api_key="lm-studio" # Required parameter, but the value is ignored locally
+)
 
+# Initialize the memory organ
+mem = Memory()
 
-def load_config() -> dict:
-    with open("nova_config.json", "r", encoding="utf-8") as f:
-        return json.load(f)
+def get_nova_response(user_input):
+    # 2. Retrieve Context from Database
+    # Using the exact keys we just verified in test_memory.py
+    user_name = mem.load("user_name").get("name", "Unknown")
+    current_goal = mem.load("goal").get("goal", "Unknown")
+    
+    # 3. Build the Identity
+    system_content = (
+        "You are Nova, a precision execution AI. "
+        f"User Name: {user_name}. "
+        f"Current Goal: {current_goal}. "
+        "Be concise, technical, and execution-focused. Do not use fluff."
+    )
 
+    messages = [
+        {"role": "system", "content": system_content},
+        {"role": "user", "content": user_input}
+    ]
 
-def main() -> None:
-    config = load_config()
-    engine_mode = config.get("engine", "local").lower()
-
+    # 4. Call Local Llama 8B via LM Studio
     try:
-        if engine_mode == "openai":
-            engine = OpenAIEngine()
-            print("[Nova] Using OpenAI engine")
-        else:
-            engine = AIEngine()
-            print("[Nova] Using LM Studio engine")
-    except (AIEngineError, OpenAIEngineError) as exc:
-        print(f"[ERROR] {exc}")
-        return
+        response = client.chat.completions.create(
+            model="local-model", # LM Studio routes this to whatever model is loaded
+            messages=messages,
+            temperature=0.7
+        )
+        
+        answer = response.choices[0].message.content
+        
+        # 5. Save interaction (Learning)
+        mem.save("last_interaction", {"user": user_input, "nova": answer})
+        
+        return answer
 
-    print("NOVA online. Type 'exit' to quit.\n")
+    except Exception as e:
+        return f"[ERROR] Connection failed. Is the LM Studio local server running? Details: {str(e)}"
 
+def main():
+    print("--- Nova Online (Local Engine + Memory Active) ---")
     while True:
-        user_input = input("You: ").strip()
-
-        if user_input.lower() in {"exit", "quit"}:
-            print("NOVA shutting down.")
+        try:
+            user_input = input("\nYou: ").strip()
+            if user_input.lower() in ['exit', 'quit']:
+                break
+            
+            response = get_nova_response(user_input)
+            print(f"\nNova: {response}")
+            
+        except KeyboardInterrupt:
             break
 
-        if not user_input:
-            print("[ERROR] Empty input.\n")
-            continue
-
-        try:
-            response = engine.generate(
-                user_input,
-                system_prompt=config.get("system_prompt")
-            )
-            print(f"\nNOVA: {response}\n")
-        except (AIEngineError, OpenAIEngineError) as exc:
-            print(f"\n[ERROR] {exc}\n")
-        
 if __name__ == "__main__":
     main()

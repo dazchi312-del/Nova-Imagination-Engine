@@ -22,11 +22,11 @@ CREATE TABLE IF NOT EXISTS taste_profile (
     last_updated DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE TABLE IF NOT EXISTS creative_arguments (
-    argument_id TEXT PRIMARY KEY,
-    idea_id TEXT,
-    champion_thesis TEXT,
-    devil_critique TEXT,
-    resolution TEXT,
-    FOREIGN KEY(idea_id) REFERENCES creative_ideas(idea_id)
+CREATE TABLE IF NOT EXISTS memory_entries (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    timestamp TEXT NOT NULL,
+    role TEXT NOT NULL,
+    content TEXT NOT NULL,
+    category TEXT DEFAULT 'general',
+    importance INTEGER DEFAULT 1
 );
