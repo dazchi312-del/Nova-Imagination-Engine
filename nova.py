@@ -1,66 +1,77 @@
-import os
-from openai import OpenAI
+﻿import json
+
+from core.ai_engine import AIEngine, AIEngineError
+from core.openai_engine import OpenAIEngine, OpenAIEngineError
 from core.memory import Memory
 
-# 1. Point directly to your local LM Studio server
-client = OpenAI(
-    base_url="http://localhost:1234/v1", 
-    api_key="lm-studio" # Required parameter, but the value is ignored locally
-)
+def load_config() -> dict:
+    with open("nova_config.json", "r", encoding="utf-8") as f:
+        return json.load(f)
 
-# Initialize the memory organ
-mem = Memory()
+def main() -> None:
+    config = load_config()
+    engine_mode = config.get("engine", "local").lower()
 
-def get_nova_response(user_input):
-    # 2. Retrieve Context from Database
-    # Using the exact keys we just verified in test_memory.py
-    user_name = mem.load("user_name").get("name", "Unknown")
-    current_goal = mem.load("goal").get("goal", "Unknown")
-    
-    # 3. Build the Identity
-    system_content = (
-        "You are Nova, a precision execution AI. "
-        f"User Name: {user_name}. "
-        f"Current Goal: {current_goal}. "
-        "Be concise, technical, and execution-focused. Do not use fluff."
-    )
+    # 1. Initialize Memory Database
+    memory = Memory()
+    print("[Nova] Memory core online.")
 
-    messages = [
-        {"role": "system", "content": system_content},
-        {"role": "user", "content": user_input}
-    ]
-
-    # 4. Call Local Llama 8B via LM Studio
     try:
-        response = client.chat.completions.create(
-            model="local-model", # LM Studio routes this to whatever model is loaded
-            messages=messages,
-            temperature=0.7
-        )
-        
-        answer = response.choices[0].message.content
-        
-        # 5. Save interaction (Learning)
-        mem.save("last_interaction", {"user": user_input, "nova": answer})
-        
-        return answer
+        if engine_mode == "openai":
+            engine = OpenAIEngine()
+            print("[Nova] Using OpenAI engine")
+        else:
+            engine = AIEngine()
+            print("[Nova] Using LM Studio engine")
+    except (AIEngineError, OpenAIEngineError) as exc:
+        print(f"[ERROR] {exc}")
+        return
 
-    except Exception as e:
-        return f"[ERROR] Connection failed. Is the LM Studio local server running? Details: {str(e)}"
+    print("NOVA online. Type 'exit' to quit.\n")
 
-def main():
-    print("--- Nova Online (Local Engine + Memory Active) ---")
     while True:
-        try:
-            user_input = input("\nYou: ").strip()
-            if user_input.lower() in ['exit', 'quit']:
-                break
-            
-            response = get_nova_response(user_input)
-            print(f"\nNova: {response}")
-            
-        except KeyboardInterrupt:
+        user_input = input("You: ").strip()
+
+        if user_input.lower() in {"exit", "quit"}:
+            print("NOVA shutting down.")
             break
 
+        if not user_input:
+            print("[ERROR] Empty input.\n")
+            continue
+
+        # 2. Retrieve: Gather persistent facts and recent history
+        persistent_context = {}
+        for key in memory.list_keys():
+            if key != "short_term_history":
+                persistent_context[key] = memory.load(key)
+        
+        history_data = memory.load("short_term_history") or {}
+        recent_history = history_data.get("log", []) if history_data else []
+
+        # 3. Inject: Attach memory invisibly to the system prompt
+        base_prompt = config.get("system_prompt", "You are Nova.")
+        memory_block = (
+            f"\n\n--- SYSTEM MEMORY ---\n"
+            f"Persistent Facts: {json.dumps(persistent_context)}\n"
+            f"Recent History: {json.dumps(recent_history)}"
+        )
+        dynamic_system_prompt = base_prompt + memory_block
+
+        try:
+            response = engine.generate(
+                user_input,
+                system_prompt=dynamic_system_prompt
+            )
+            print(f"\nNOVA: {response}\n")
+
+            # 4. Persist: Save the exchange to short-term history
+            recent_history.append({"user": user_input, "nova": response})
+            recent_history = recent_history[-5:] # Keep last 5 exchanges
+            memory.save("short_term_history", {"log": recent_history})
+
+        except (AIEngineError, OpenAIEngineError) as exc:
+            print(f"\n[ERROR] {exc}\n")
+        
 if __name__ == "__main__":
     main()

@@ -1,0 +1,12 @@
+{"timestamp": "2026-04-08T02:03:33.037492", "level": "VISION", "message": "Nova Imagination Engine initialized", "metadata": {}}
+{"timestamp": "2026-04-08T02:03:33.038106", "level": "VISION", "message": "=== AI Engine Tests Begin ===", "metadata": {}}
+{"timestamp": "2026-04-08T02:03:33.038517", "level": "SYSTEM", "message": "AIEngine ready: llama-3.1-8b-instruct @ http://localhost:1234", "metadata": {"model": "llama-3.1-8b-instruct", "endpoint": "http://localhost:1234/v1/chat/completions"}}
+{"timestamp": "2026-04-08T02:03:33.038804", "level": "ARCH", "message": "Test 1: Basic generation", "metadata": {}}
+{"timestamp": "2026-04-08T02:03:33.039758", "level": "SYSTEM", "message": "LLM request attempt 1/3", "metadata": {}}
+{"timestamp": "2026-04-08T02:03:38.131526", "level": "SYSTEM", "message": "LLM response received", "metadata": {"prompt_tokens": 101, "completion_tokens": 5, "total_session_tokens": 106}}
+{"timestamp": "2026-04-08T02:03:38.132062", "level": "ARCH", "message": "Test 2: generate_with_history", "metadata": {}}
+{"timestamp": "2026-04-08T02:03:38.132687", "level": "SYSTEM", "message": "LLM request attempt 1/3", "metadata": {}}
+{"timestamp": "2026-04-08T02:03:40.656257", "level": "SYSTEM", "message": "LLM response received", "metadata": {"prompt_tokens": 120, "completion_tokens": 23, "total_session_tokens": 249}}
+{"timestamp": "2026-04-08T02:03:40.656607", "level": "ARCH", "message": "Test 3: Token tracking", "metadata": {}}
+{"timestamp": "2026-04-08T02:03:40.656867", "level": "ARCH", "message": "Test 4: Empty input guard", "metadata": {}}
+{"timestamp": "2026-04-08T02:03:40.657142", "level": "VISION", "message": "=== AI Engine Tests Complete ===", "metadata": {}}

@@ -1,0 +1,20 @@
+{"timestamp": "2026-04-08T01:51:43.831774", "level": "VISION", "message": "Nova Imagination Engine initialized", "metadata": {}}
+{"timestamp": "2026-04-08T01:51:43.832249", "level": "VISION", "message": "=== Layer 1 Tool Tests Begin ===", "metadata": {}}
+{"timestamp": "2026-04-08T01:51:43.832702", "level": "ARCH", "message": "Test 1: write_file", "metadata": {}}
+{"timestamp": "2026-04-08T01:51:43.833020", "level": "CODE", "message": "Writing file: temp/test_output.py", "metadata": {}}
+{"timestamp": "2026-04-08T01:51:43.833704", "level": "CODE", "message": "Write success: temp/test_output.py", "metadata": {"path": "temp/test_output.py", "size_bytes": 39, "lines": 1}}
+{"timestamp": "2026-04-08T01:51:43.834153", "level": "ARCH", "message": "Test 2: read_file", "metadata": {}}
+{"timestamp": "2026-04-08T01:51:43.834569", "level": "CODE", "message": "Reading file: temp/test_output.py", "metadata": {}}
+{"timestamp": "2026-04-08T01:51:43.834997", "level": "CODE", "message": "Read success: temp/test_output.py", "metadata": {"path": "temp/test_output.py", "size_bytes": 39, "lines": 1}}
+{"timestamp": "2026-04-08T01:51:43.835249", "level": "ARCH", "message": "Test 3: run_code", "metadata": {}}
+{"timestamp": "2026-04-08T01:51:43.835475", "level": "CODE", "message": "Executing code block", "metadata": {}}
+{"timestamp": "2026-04-08T01:51:43.857828", "level": "CODE", "message": "Code execution success", "metadata": {"exit_code": 0, "stdout_preview": "Nova Layer 1 run_code works"}}
+{"timestamp": "2026-04-08T01:51:43.858787", "level": "ARCH", "message": "Test 4: run_code failure capture", "metadata": {}}
+{"timestamp": "2026-04-08T01:51:43.859163", "level": "CODE", "message": "Executing code block", "metadata": {}}
+{"timestamp": "2026-04-08T01:51:43.898671", "level": "CODE", "message": "Code execution failed", "metadata": {"exit_code": 1, "stderr": "Traceback (most recent call last):\n  File \"<string>\", line 1, in <module>\n    raise ValueError('intentional test error')\nValueError: intentional test error"}}
+{"timestamp": "2026-04-08T01:51:43.899111", "level": "ARCH", "message": "Test 5: list_files", "metadata": {}}
+{"timestamp": "2026-04-08T01:51:43.899506", "level": "STRUCT", "message": "Listing files in: .", "metadata": {}}
+{"timestamp": "2026-04-08T01:51:43.988388", "level": "STRUCT", "message": "Listed 39 files", "metadata": {"directory": ".", "count": 39}}
+{"timestamp": "2026-04-08T01:51:43.989941", "level": "ARCH", "message": "Test 6: NovaToolError on missing file", "metadata": {}}
+{"timestamp": "2026-04-08T01:51:43.990188", "level": "CODE", "message": "Reading file: does/not/exist.py", "metadata": {}}
+{"timestamp": "2026-04-08T01:51:43.990476", "level": "VISION", "message": "=== Layer 1 Tool Tests Complete ===", "metadata": {}}

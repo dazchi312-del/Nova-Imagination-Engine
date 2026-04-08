@@ -1,0 +1,36 @@
+{"timestamp": "2026-04-08T08:54:50.831758", "level": "VISION", "message": "Nova Imagination Engine initialized", "metadata": {}}
+{"timestamp": "2026-04-08T08:54:50.833696", "level": "SYSTEM", "message": "Loading configuration...", "metadata": {}}
+{"timestamp": "2026-04-08T08:54:50.834272", "level": "SYSTEM", "message": "Configuration loaded successfully", "metadata": {"engine": "local", "model": "llama-3.1-8b-instruct"}}
+{"timestamp": "2026-04-08T08:54:50.834951", "level": "VISION", "message": "=== Nova Core Tests Begin ===", "metadata": {}}
+{"timestamp": "2026-04-08T08:54:50.835569", "level": "VISION", "message": "Initialising Nova Core...", "metadata": {}}
+{"timestamp": "2026-04-08T08:54:50.837968", "level": "SYSTEM", "message": "AIEngine ready: llama-3.1-8b-instruct @ http://localhost:1234", "metadata": {"model": "llama-3.1-8b-instruct", "endpoint": "http://localhost:1234/v1/chat/completions"}}
+{"timestamp": "2026-04-08T08:54:50.838422", "level": "VISION", "message": "Nova Core ready.", "metadata": {}}
+{"timestamp": "2026-04-08T08:54:50.839777", "level": "PRODUCT", "message": "Input received: /help", "metadata": {}}
+{"timestamp": "2026-04-08T08:54:50.840166", "level": "STRUCT", "message": "Command: /help", "metadata": {}}
+{"timestamp": "2026-04-08T08:54:50.841299", "level": "PRODUCT", "message": "Input received: /status", "metadata": {}}
+{"timestamp": "2026-04-08T08:54:50.841611", "level": "STRUCT", "message": "Command: /status", "metadata": {}}
+{"timestamp": "2026-04-08T08:54:50.842173", "level": "PRODUCT", "message": "Input received: /files", "metadata": {}}
+{"timestamp": "2026-04-08T08:54:50.842424", "level": "STRUCT", "message": "Command: /files", "metadata": {}}
+{"timestamp": "2026-04-08T08:54:50.842696", "level": "STRUCT", "message": "Listing files in: C:\\Users\\dazch\\nova", "metadata": {}}
+{"timestamp": "2026-04-08T08:54:50.936190", "level": "STRUCT", "message": "Listed 49 files", "metadata": {"directory": "C:\\Users\\dazch\\nova", "count": 49}}
+{"timestamp": "2026-04-08T08:54:50.937498", "level": "PRODUCT", "message": "Input received: /unknown", "metadata": {}}
+{"timestamp": "2026-04-08T08:54:50.937864", "level": "STRUCT", "message": "Command: /unknown", "metadata": {}}
+{"timestamp": "2026-04-08T08:54:50.940199", "level": "PRODUCT", "message": "Input received: What is your name and purpose?", "metadata": {}}
+{"timestamp": "2026-04-08T08:54:50.940452", "level": "ARCH", "message": "Task #1 starting", "metadata": {}}
+{"timestamp": "2026-04-08T08:54:50.940669", "level": "ARCH", "message": "Planning...", "metadata": {}}
+{"timestamp": "2026-04-08T08:54:50.940895", "level": "CODE", "message": "Writing file: C:\\Users\\dazch\\nova\\plan.md", "metadata": {}}
+{"timestamp": "2026-04-08T08:54:50.941304", "level": "CODE", "message": "Write success: C:\\Users\\dazch\\nova\\plan.md", "metadata": {"path": "C:\\Users\\dazch\\nova\\plan.md", "size_bytes": 548, "lines": 24}}
+{"timestamp": "2026-04-08T08:54:50.941490", "level": "STRUCT", "message": "Plan written to C:\\Users\\dazch\\nova\\plan.md", "metadata": {}}
+{"timestamp": "2026-04-08T08:54:50.941820", "level": "ARCH", "message": "Plan created (548 chars)", "metadata": {}}
+{"timestamp": "2026-04-08T08:54:50.942324", "level": "SYSTEM", "message": "LLM request attempt 1/3", "metadata": {}}
+{"timestamp": "2026-04-08T08:54:54.970587", "level": "SYSTEM", "message": "LLM response received", "metadata": {"prompt_tokens": 232, "completion_tokens": 171, "total_session_tokens": 403}}
+{"timestamp": "2026-04-08T08:54:54.971141", "level": "ARCH", "message": "Reflection: GOOD", "metadata": {}}
+{"timestamp": "2026-04-08T08:54:54.971700", "level": "ARCH", "message": "Reflection: GOOD", "metadata": {}}
+{"timestamp": "2026-04-08T08:54:54.972350", "level": "PRODUCT", "message": "Input received: /plan", "metadata": {}}
+{"timestamp": "2026-04-08T08:54:54.972612", "level": "STRUCT", "message": "Command: /plan", "metadata": {}}
+{"timestamp": "2026-04-08T08:54:54.972939", "level": "CODE", "message": "Reading file: C:\\Users\\dazch\\nova\\plan.md", "metadata": {}}
+{"timestamp": "2026-04-08T08:54:54.973442", "level": "CODE", "message": "Read success: C:\\Users\\dazch\\nova\\plan.md", "metadata": {"path": "C:\\Users\\dazch\\nova\\plan.md", "size_bytes": 548, "lines": 24}}
+{"timestamp": "2026-04-08T08:54:54.973826", "level": "PRODUCT", "message": "Input received: /clear", "metadata": {}}
+{"timestamp": "2026-04-08T08:54:54.974088", "level": "STRUCT", "message": "Command: /clear", "metadata": {}}
+{"timestamp": "2026-04-08T08:54:54.974354", "level": "STRUCT", "message": "Conversation history cleared.", "metadata": {}}
+{"timestamp": "2026-04-08T08:54:54.974629", "level": "VISION", "message": "=== Nova Core Tests Complete ===", "metadata": {}}
