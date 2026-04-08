@@ -20,29 +20,19 @@ class Agent:
         self.executor = Executor()
         session_logger.log("Agent ready", LogLevel.ARCH)
 
-    def _generate_code(self, description: str, filename: str) -> str:
-        prompt = f"""You are Nova, an autonomous Python developer.
-
-Write a complete, self-contained Python script that does the following:
-{description}
-
-Rules:
-- Output ONLY raw Python code
-- No markdown, no backticks, no explanation
-- The script must run with no arguments"""
-
+    def _generate_code(self, task: str, filename: str) -> str:
+        import re
+        prompt = f"""Write Python code for this task: {task}
+Output ONLY raw Python code. No explanation. No markdown. No code fences."""
+        
         raw = self.ai.generate(prompt)
-        if not raw:
-            return ""
+        
+        # Strip markdown fences robustly
+        cleaned = re.sub(r'^```[\w\s]*\n?', '', raw.strip())
+        cleaned = re.sub(r'\n?```[\w\s]*$', '', cleaned)
+        return cleaned.strip()
 
-        # Strip markdown code fences if LLM ignores instructions
-        lines = raw.strip().splitlines()
-        if lines and lines[0].strip().startswith("```"):
-            lines = lines[1:]
-        if lines and lines[-1].strip() == "```":
-            lines = lines[:-1]
 
-        return "\n".join(lines).strip()
 
     def run(self, goal: str) -> str:
         session_logger.log(f"Agent received goal: {goal}", LogLevel.VISION)
