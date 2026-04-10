@@ -8,7 +8,7 @@
   "lm_studio": {
     "base_url": "http://localhost:1234",
     "chat_endpoint": "/v1/chat/completions",
-    "model": "llama-3.1-8b-instruct",
+    "model": "llama-3.1-nemotron-70b-instruct-hf",
     "timeout_seconds": 60
   },
   "generation": {
