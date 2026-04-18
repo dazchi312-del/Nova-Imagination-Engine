@@ -24,8 +24,6 @@ FOLDER_PRIORITY = {
     "projects":     5,
     "inbox":        6,
 }
-
-
 # ── Frontmatter Parser ─────────────────────────────────────────────────────────
 
 def parse_frontmatter(content: str) -> tuple[dict, str]:
@@ -187,6 +185,32 @@ class ObsidianBridge:
             "vault_path": str(self.vault_path),
         }
 
+    def status(self) -> dict:
+        """
+        Returns a status dict for the /status command in loop.py.
+        """
+        data = self.summary()
+        return {
+            "vault_path":  data["vault_path"],
+            "note_count":  data["total_notes"],
+            "by_folder":   data["by_folder"],
+        }
+
+    def debug_summary(self):
+        """
+        Prints full vault breakdown to terminal for the /debug command.
+        """
+        data = self.summary()
+        print(f"\n[Debug] Vault path : {data['vault_path']}")
+        print(f"[Debug] Total notes: {data['total_notes']}")
+        print(f"[Debug] By folder  :")
+        for folder, count in sorted(data["by_folder"].items()):
+            print(f"         {folder:<14} {count} note(s)")
+        print("\n[Debug] Note index:")
+        for note in self.notes:
+            print(f"  [{note.folder}] {note.title}")
+        print()
+
 
 # ── Quick Test ─────────────────────────────────────────────────────────────────
 
@@ -204,3 +228,4 @@ if __name__ == "__main__":
     for r in results:
         print(f"  {r.folder}/{r.filename}")
         print(f"  Preview: {r.preview(120)}\n")
+

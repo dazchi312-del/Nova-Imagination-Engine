@@ -138,6 +138,29 @@ def get_recent_context(n: int = 6) -> list[dict]:
     messages = [{"role": r, "content": c} for r, c in reversed(rows)]
     return messages
 
+def get_session_context(session_id: str, n: int = 6) -> list[dict]:
+    """
+    Pull last N turn pairs from the CURRENT session only.
+    Used by loop.py to maintain in-session coherence.
+    """
+    con = sqlite3.connect(DB_PATH)
+    cur = con.cursor()
+
+    cur.execute("""
+        SELECT role, content
+        FROM turns
+        WHERE session_id = ?
+        ORDER BY id DESC
+        LIMIT ?
+    """, (session_id, n * 2))
+
+    rows = cur.fetchall()
+    con.close()
+
+    messages = [{"role": r, "content": c} for r, c in reversed(rows)]
+    return messages
+
+
 
 def get_session_summary(session_id: str) -> dict:
     """Return metadata for a specific session."""

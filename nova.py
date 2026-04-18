@@ -1,10 +1,9 @@
 import sys
 import subprocess
 import os
-from core.loop import chat
+from core.loop import run_loop, interactive_loop
 
 if __name__ == "__main__":
-    # Auto-launch scheduler in background
     scheduler_path = os.path.join(os.path.dirname(__file__), "core", "scheduler.py")
     subprocess.Popen(
         [sys.executable, scheduler_path],
@@ -18,21 +17,7 @@ if __name__ == "__main__":
 
     if args:
         prompt = " ".join(args)
-        response = chat(prompt)
+        response = run_loop(prompt, dry_run=dry_run)
         print(response)
     else:
-        print("[Nova] Online. Type 'exit' to quit.")
-        while True:
-            try:
-                user_input = input("You: ").strip()
-                if user_input.lower() in ("exit", "quit"):
-                    print("[Nova] Shutting down.")
-                    break
-                if not user_input:
-                    continue
-                response = chat(user_input)
-                print(f"Nova: {response}")
-            except KeyboardInterrupt:
-                print("\n[Nova] Interrupted. Shutting down.")
-                break
-
+        interactive_loop(dry_run=dry_run)

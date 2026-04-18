@@ -12,10 +12,11 @@
   },
 
   "reflector": {
-    "base_url": "http://10.0.0.167:1235",
+    "base_url": "http://10.0.0.167:11434",
     "model": "llama3.1:8b"
   },
 
   "reflection_threshold": 0.75,
   "history_window":       20
 }
+

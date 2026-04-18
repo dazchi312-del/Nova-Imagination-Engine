@@ -1,0 +1,204 @@
+# core/loop.py
+# v0.8.5 — max_tokens 1024, reflector context, RAG debug, retry visibility, command handler
+
+import json
+import re
+import requests
+from core.identity import NOVA_IDENTITY
+from core.memory import init_db, new_session, close_session, log_turn, get_session_context
+from core.Obsidian_bridge import ObsidianBridge
+
+with open("nova_config.json") as f:
+    cfg = json.load(f)
+
+PRIMARY_URL   = cfg["base_url"]
+PRIMARY_MODEL = cfg["primary_model"]
+REFLECT_URL   = cfg["reflector"]["base_url"]
+REFLECT_MODEL = cfg["reflector"]["model"]
+
+THRESHOLD = 0.75
+PRIMARY_TIMEOUT   = 180
+REFLECTOR_TIMEOUT = 30
+
+bridge = ObsidianBridge()
+
+# ── Command Handler ─────────────────────────────────────────────────────────
+
+def handle_command(cmd, session_id):
+    cmd = cmd.strip().lower()
+
+    if cmd == "/status":
+        info = bridge.status()
+        print(f"\n[Status] Session: {session_id}")
+        print(f"[Status] Vault: {info.get('vault_path')}")
+        print(f"[Status] Notes indexed: {info.get('note_count')}")
+        print(f"[Status] Primary model: {PRIMARY_MODEL} @ {PRIMARY_URL}")
+        print(f"[Status] Reflector model: {REFLECT_MODEL} @ {REFLECT_URL}")
+        print(f"[Status] Threshold: {THRESHOLD} | Primary timeout: {PRIMARY_TIMEOUT}s\n")
+        return True
+
+    if cmd == "/debug":
+        print("\n[Debug] Triggering vault index summary...")
+        bridge.debug_summary()
+        return True
+
+    if cmd == "/save":
+        print("[Save] Session is auto-saved each turn. Nothing additional to flush.\n")
+        return True
+
+    if cmd == "/clear":
+        print("[Clear] Clearing terminal display...\n")
+        import os
+        os.system("cls" if os.name == "nt" else "clear")
+        return True
+
+    if cmd == "/help":
+        print("\nCommands:")
+        print("  /status  — show system info and vault stats")
+        print("  /debug   — print vault index summary")
+        print("  /save    — confirm session is saved")
+        print("  /clear   — clear terminal")
+        print("  /help    — show this list")
+        print("  exit     — end session\n")
+        return True
+
+    return False  # Not a command
+
+# ── Primary Call ────────────────────────────────────────────────────────────
+
+def call_primary(messages):
+    print("[Primary] Calling Nemotron 70B...")
+    try:
+        r = requests.post(
+            f"{PRIMARY_URL}/chat/completions",
+            json={
+                "model": PRIMARY_MODEL,
+                "messages": messages,
+                "temperature": 0.7,
+                "max_tokens": 1024          # ← was 512
+            },
+            timeout=PRIMARY_TIMEOUT
+        )
+        return r.json()["choices"][0]["message"]["content"]
+    except requests.exceptions.Timeout:
+        print("[Primary] Timeout — no response in 180s")
+        return "I'm sorry, the primary model timed out. Please try again."
+    except Exception as e:
+        print(f"[Primary] Error: {e}")
+        return "I'm sorry, the primary model encountered an error."
+
+# ── Reflector Call ──────────────────────────────────────────────────────────
+
+def call_reflector(original, response):
+    print("[Reflector] Calling llama3.1:8b on MacBook...")
+    payload = {
+        "model": REFLECT_MODEL,
+        "prompt": (
+            f"You are evaluating a response from Nova, an AI assistant built by Daz — "
+            f"a musician and systems thinker focused on creative tools and AI workflows.\n\n"
+            f"Rate this response for accuracy, clarity, and helpfulness on a scale of 0.0 to 1.0.\n"
+            f"Consider whether it serves a creative/technical builder context.\n\n"
+            f"Q: {original}\n"
+            f"A: {response}\n\n"
+            f"Reply with a single decimal score only (e.g. 0.8):"
+        ),
+        "stream": False
+    }
+    try:
+        r = requests.post(
+            f"{REFLECT_URL}/api/generate",
+            json=payload,
+            timeout=REFLECTOR_TIMEOUT
+        )
+        raw = r.json()["response"].strip()
+        match = re.search(r"\d+\.\d+|\d+", raw)
+        if match:
+            score = float(match.group())
+            return min(max(score, 0.0), 1.0)
+        print("[Reflector] Unparseable response — defaulting to 1.0")
+        return 1.0
+    except requests.exceptions.Timeout:
+        print("[Reflector] Timeout — defaulting score to 1.0")
+        return 1.0
+    except Exception as e:
+        print(f"[Reflector] Error: {e} — defaulting score to 1.0")
+        return 1.0
+
+# ── Message Builder ─────────────────────────────────────────────────────────
+
+def build_messages(session_id, user_input):
+    system_content = NOVA_IDENTITY
+
+    # Always-on: identity + architecture folders
+    vault_core = bridge.identity_context()
+    if vault_core and "No identity" not in vault_core:
+        system_content += f"\n\n---\nVAULT CONTEXT (Identity/Architecture):\n{vault_core}"
+
+    # Per-turn: dynamic note match
+    vault_dynamic = bridge.context_block(user_input, top_k=2)
+    if vault_dynamic and "No relevant" not in vault_dynamic:
+        system_content += f"\n\n---\nVAULT CONTEXT (Relevant Notes):\n{vault_dynamic}"
+        print(f"[RAG] Injected dynamic vault context for: '{user_input[:60]}'")
+    else:
+        print(f"[RAG] No dynamic vault match for: '{user_input[:60]}'")
+
+    messages = [{"role": "system", "content": system_content}]
+    history = get_session_context(session_id, n=6)
+    messages.extend(history)
+    messages.append({"role": "user", "content": user_input})
+    return messages
+
+# ── Turn Runner ─────────────────────────────────────────────────────────────
+
+def run_turn(session_id, user_input, dry_run=False):
+    if dry_run:
+        response = f"[DRY RUN] Would send: {user_input}"
+        score = 1.0
+        log_turn(session_id, "user", user_input)
+        log_turn(session_id, "assistant", response, score=score)
+        return response, score
+
+    messages = build_messages(session_id, user_input)
+    response = call_primary(messages)
+    score = call_reflector(user_input, response)
+    print(f"[Reflector] Score: {score}")
+
+    if score < THRESHOLD:
+        print(f"[Reflector] Score {score:.2f} below threshold {THRESHOLD} — regenerating once...")
+        response = call_primary(messages)
+        score = call_reflector(user_input, response)
+        print(f"[Reflector] Retry score: {score:.2f}")
+        if score < THRESHOLD:
+            print(f"[Reflector] Retry still below threshold — accepting anyway to prevent loop")
+
+    log_turn(session_id, "user", user_input)
+    log_turn(session_id, "assistant", response, score=score)
+    return response, score
+
+# ── Main Loop ───────────────────────────────────────────────────────────────
+
+def interactive_loop(dry_run=False):
+    init_db()
+    session_id = new_session()
+    print(f"Nova v0.8.5 — session {session_id}")
+    print("Type /help for commands or 'exit' to quit\n")
+    try:
+        while True:
+            user_input = input("You: ").strip()
+            if not user_input:
+                continue
+            if user_input.lower() == "exit":
+                break
+            if user_input.startswith("/"):
+                handle_command(user_input, session_id)
+                continue
+            response, score = run_turn(session_id, user_input, dry_run=dry_run)
+            print(f"\nNova: {response}")
+            print(f"[Score: {score:.2f}]\n")
+    finally:
+        close_session(session_id)
+        print("[Memory] Session saved.")
+
+if __name__ == "__main__":
+    interactive_loop(dry_run=False)
+
