@@ -1,0 +1,18 @@
+# Enforce LF line endings for all text files in the repo.
+# Windows checkouts will have LF on disk; that's intentional and fine.
+* text=auto eol=lf
+
+# Explicit overrides for clarity
+*.py    text eol=lf
+*.md    text eol=lf
+*.toml  text eol=lf
+*.txt   text eol=lf
+*.json  text eol=lf
+*.yml   text eol=lf
+*.yaml  text eol=lf
+
+# Binary files ??? never touch
+*.png   binary
+*.jpg   binary
+*.gz    binary
+*.zip   binary
