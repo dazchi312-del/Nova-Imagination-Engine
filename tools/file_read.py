@@ -1,4 +1,4 @@
-﻿"""
+"""
 tools/file_read.py
 L2 Tool — Read a file from the workspace safely.
 """

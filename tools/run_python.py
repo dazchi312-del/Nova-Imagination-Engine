@@ -1,4 +1,4 @@
-﻿"""
+"""
 tools/run_python.py
 L2 Tool — Execute a Python code snippet in a sandboxed subprocess.
 """

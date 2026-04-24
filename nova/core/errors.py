@@ -1,4 +1,4 @@
-﻿"""
+"""
 Nova App Builder Error Hierarchy
 Designed for self-correction and autonomous problem-solving
 """

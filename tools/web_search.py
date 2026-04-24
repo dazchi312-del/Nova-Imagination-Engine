@@ -1,4 +1,4 @@
-﻿"""
+"""
 tools/web_search.py
 L2 Tool — Web search stub. Returns structured placeholder.
 Upgrade path: DuckDuckGo API, SerpAPI, or Playwright scraping.

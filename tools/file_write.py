@@ -1,4 +1,4 @@
-﻿"""
+"""
 tools/file_write.py
 L2 Tool — Write or append to a file in the workspace safely.
 """

@@ -1,4 +1,4 @@
-﻿import sys
+import sys
 sys.path.insert(0, r"C:\Users\dazch\nova")
 
 from nova.core.loop import run_loop

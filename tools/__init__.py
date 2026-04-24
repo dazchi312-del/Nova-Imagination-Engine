@@ -1,4 +1,4 @@
-﻿"""
+"""
 tools/__init__.py
 L2 Tool Layer — exposes all tools for import
 """

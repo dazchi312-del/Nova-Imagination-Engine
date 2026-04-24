@@ -1,4 +1,4 @@
-﻿"""
+"""
 tools/dispatcher.py
 L2 Tool — Detects and routes tool calls embedded in Nova responses.
 

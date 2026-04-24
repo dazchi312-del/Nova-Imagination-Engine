@@ -1,4 +1,4 @@
-﻿# ast_shield.py v1.1.0
+# ast_shield.py v1.1.0
 # Location: nova/core/ast_shield.py
 # Purpose: Static analysis gate for LLM-generated code, before sandbox execution.
 #
