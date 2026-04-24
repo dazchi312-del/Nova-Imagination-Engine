@@ -1,7 +1,7 @@
 ﻿import sys
 sys.path.insert(0, r"C:\Users\dazch\nova")
 
-from core.loop import run_loop
+from nova.core.loop import run_loop
 
 print("=== Test 1: Plain conversation (no tool) ===")
 reply = run_loop("What is 2 + 2? Answer in one sentence.")

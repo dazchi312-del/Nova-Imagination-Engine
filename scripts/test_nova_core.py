@@ -6,8 +6,8 @@ Tests: commands, planning, autonomous loop, reflection
 import sys
 sys.path.insert(0, r"C:\Users\dazch\nova")
 
-from core.nova import Nova
-from core.logger import session_logger, LogLevel
+from nova.core.nova import Nova
+from nova.core.logger import session_logger, LogLevel
 
 
 def test_nova_core():

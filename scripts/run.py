@@ -4,9 +4,9 @@ import uuid
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
-from core.router import MemoryAwareRouter
-from core.memory import Memory
-from core.agents import Agent
+from nova.core.router import MemoryAwareRouter
+from nova.core.memory import Memory
+from nova.core.agents import Agent
 
 agents = {"agent1": {"capabilities": ["text"]}, "agent2": {"capabilities": ["image"]}}
 

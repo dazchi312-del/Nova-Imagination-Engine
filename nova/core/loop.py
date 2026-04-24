@@ -29,8 +29,8 @@ from typing import Optional
 
 import requests
 
-from core.ast_shield import shield_gate
-from core.sandbox import execute_sandboxed, SandboxResult, SandboxStatus
+from nova.core.ast_shield import shield_gate
+from nova.core.sandbox import execute_sandboxed, SandboxResult, SandboxStatus
 
 log = logging.getLogger("nova.loop")
 

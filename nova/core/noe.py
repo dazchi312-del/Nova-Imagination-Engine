@@ -4,7 +4,7 @@
 
 import json
 from dataclasses import dataclass
-from core.loop import call_primary, call_reflector
+from nova.core.loop import call_primary, call_reflector
 
 with open("nova_config.json") as f:
     cfg = json.load(f)

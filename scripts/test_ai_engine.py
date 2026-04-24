@@ -6,9 +6,9 @@ Verifies LM Studio connection and generation
 import sys
 sys.path.insert(0, r"C:\Users\dazch\nova")
 
-from core.ai_engine import AIEngine
-from core.errors import NovaEngineError
-from core.logger import session_logger, LogLevel
+from nova.core.ai_engine import AIEngine
+from nova.core.errors import NovaEngineError
+from nova.core.logger import session_logger, LogLevel
 
 
 def test_ai_engine():

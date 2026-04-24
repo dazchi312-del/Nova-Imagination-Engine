@@ -4,7 +4,7 @@ import json
 import re
 from typing import Any
 
-from core.tools import read_file, write_file, list_directory, run_shell, list_processes, kill_process, get_system_stats, ToolError
+from nova.core.tools import read_file, write_file, list_directory, run_shell, list_processes, kill_process, get_system_stats, ToolError
 
 
 TOOL_SCHEMA = """

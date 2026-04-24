@@ -13,7 +13,7 @@ from pathlib import Path
 # Ensure project root is on the path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from core.scheduler_db import (
+from nova.core.scheduler_db import (
     init_scheduler_schema,
     get_due_tasks,
     mark_running,
@@ -23,7 +23,7 @@ from core.scheduler_db import (
     write_result,
     log_event,
 )
-from core.tools import (
+from nova.core.tools import (
     get_system_stats,
     list_processes,
     kill_process,

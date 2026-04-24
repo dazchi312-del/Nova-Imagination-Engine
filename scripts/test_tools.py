@@ -5,9 +5,9 @@ Test Layer 1 - File I/O and Code Execution Tools
 import sys
 sys.path.insert(0, r"C:\Users\dazch\nova")
 
-from core.tools import read_file, write_file, run_code, list_files
-from core.errors import NovaToolError
-from core.logger import session_logger, LogLevel
+from nova.core.tools import read_file, write_file, run_code, list_files
+from nova.core.errors import NovaToolError
+from nova.core.logger import session_logger, LogLevel
 
 
 def test_layer1():

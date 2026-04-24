@@ -5,9 +5,9 @@ Test the App Builder foundational nervous system
 import sys
 sys.path.insert(0, r"C:\Users\dazch\nova")
 
-from core.logger import session_logger, LogLevel
-from core.errors import NovaToolError, NovaPlanningError
-from core.config import config
+from nova.core.logger import session_logger, LogLevel
+from nova.core.errors import NovaToolError, NovaPlanningError
+from nova.core.config import config
 
 
 def test_app_builder_thinking():

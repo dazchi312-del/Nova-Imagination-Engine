@@ -17,7 +17,7 @@ from enum import Enum
 
 # Add core to path
 sys.path.insert(0, str(Path(__file__).parent.parent))
-from core.noe import NovaOutputEngine
+from nova.core.noe import NovaOutputEngine
 
 
 class LabStatus(Enum):

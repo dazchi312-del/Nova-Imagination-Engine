@@ -6,7 +6,7 @@ Judge and improve architecture with refinement cycles
 import requests
 import json
 import re
-from core.scoring import calculate_weighted_score
+from nova.core.scoring import calculate_weighted_score
 
 # Configuration
 PRIMARY_URL = "http://localhost:1234/v1/chat/completions"

@@ -13,7 +13,7 @@ Organized by threat category:
 
 import pytest
 
-from core.ast_shield import (
+from nova.core.ast_shield import (
     scan_code,
     shield_gate,
     Severity,

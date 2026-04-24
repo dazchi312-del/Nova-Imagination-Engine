@@ -7,10 +7,10 @@ import sys
 import os
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from core.logger import log, set_level
-from core.executor import Executor
-from core.builder import Builder
-from core.config import load_config
+from nova.core.logger import log, set_level
+from nova.core.executor import Executor
+from nova.core.builder import Builder
+from nova.core.config import load_config
 
 set_level("CODE")
 

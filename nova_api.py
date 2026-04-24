@@ -6,8 +6,8 @@ from pydantic import BaseModel
 from typing import Optional
 
 # Import your existing Phase 10 engine
-from core.loop import run_turn, breaker
-from core.memory import init_db, new_session, close_session
+from nova.core.loop import run_turn, breaker
+from nova.core.memory import init_db, new_session, close_session
 
 app = FastAPI(title="Project Nova API", version="0.11.0")
 

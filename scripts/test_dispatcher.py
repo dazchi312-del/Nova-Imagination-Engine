@@ -1,7 +1,7 @@
 import sys
 sys.path.insert(0, r"C:\Users\dazch\nova")
 
-from core.dispatcher import dispatch, TOOL_SCHEMA
+from nova.core.dispatcher import dispatch, TOOL_SCHEMA
 
 # Test 1: no tool call
 called, out = dispatch("Hello Nova, how are you?")
