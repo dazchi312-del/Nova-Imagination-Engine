@@ -274,7 +274,7 @@ Start directly with Python code."""
                 [sys.executable, str(code_file)],
                 capture_output=True,
                 text=True,
-                timeout=self.sandbox_timeout,
+                timeout_s=self.sandbox_timeout,
                 cwd=str(self.sandbox_path)
             )
             

@@ -267,7 +267,7 @@ def _run_sandboxed(code: str, cfg: LoopConfig) -> SandboxResult:
             truncated_stdout=False,
             truncated_stderr=False,
         )
-    return execute_sandboxed(code, timeout=cfg.sandbox_timeout_s)
+    return execute_sandboxed(code, timeout_s=cfg.sandbox_timeout_s)
 
 
 # ===== REFINE =====
