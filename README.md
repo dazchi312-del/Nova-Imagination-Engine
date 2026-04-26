@@ -1,4 +1,4 @@
-# 🌀 dazchiago | Project Nova (Imagination Engine)
+# 🌀 dazchicago | Project Nova (Imagination Engine)
     
     **The Local-First Sovereign Intelligence Lattice**
     
@@ -25,7 +25,7 @@
     Compiler-grade security using *Abstract Syntax Tree (AST) parsing* to scan code for forbidden operations before execution, ensuring the sovereign host remains protected.
     
     ## The Mission
-    To transform AI from a reactive assistant into an autonomous explorer, led by dazchiago. Nova is built to:
+    To transform AI from a reactive assistant into an autonomous explorer, led by dazchicago. Nova is built to:
     
     * **Operate Locally:** Run entirely on your hardware, free from cloud dependencies and data privacy concerns.
     * **Be Sovereign:** You control the AI, its data, and its operations. No external kill-switches or forced updates.
