@@ -241,7 +241,7 @@ def execute_sandboxed(code: str, timeout_s: Optional[int] = None, gpu_access: bo
         # ---- Layer 4: The real security boundary — the container ----
         # Every flag below is deliberate. If you don't know why one is there,
         # look it up before removing it.
-        # AD-133: GPU access requires the nvidia runtime; gVisor (runsc) does
+        # ADR-133: GPU access requires the nvidia runtime; gVisor (runsc) does
         # not support CUDA passthrough. When gpu_access=True we trade the
         # user-space kernel boundary for hardware acceleration. Caller's choice.
         active_runtime = "nvidia" if gpu_access else DOCKER_RUNTIME
