@@ -1,4 +1,4 @@
-# 🌀 dazchicago | Project Nova (Imagination Engine)
+# 🌀 Dazchicago | Project Nova (Imagination Engine)
     
     **The Local-First Sovereign Intelligence Lattice**
     
