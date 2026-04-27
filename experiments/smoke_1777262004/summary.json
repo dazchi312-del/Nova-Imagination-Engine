@@ -1,0 +1,36 @@
+{
+  "experiment_id": "smoke_1777262004",
+  "goal": "Plot both curves and quantify smoothness via total variation.",
+  "initial_hypothesis": "The sine function is smoother than a random walk on [0, 4\u03c0].",
+  "best_iteration_index": 5,
+  "final_score": 0.75,
+  "stopped_reason": "max_iterations",
+  "iteration_count": 5,
+  "scores": [
+    {
+      "iter": 1,
+      "status": "sandbox_error",
+      "overall": 0.5
+    },
+    {
+      "iter": 2,
+      "status": "sandbox_error",
+      "overall": 0.5
+    },
+    {
+      "iter": 3,
+      "status": "sandbox_error",
+      "overall": 0.63
+    },
+    {
+      "iter": 4,
+      "status": "sandbox_error",
+      "overall": 0.5
+    },
+    {
+      "iter": 5,
+      "status": "sandbox_error",
+      "overall": 0.75
+    }
+  ]
+}
