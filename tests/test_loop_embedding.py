@@ -6,6 +6,7 @@ import pytest
 from nova.core.loop import _run_one_iteration, LoopConfig, ReflectorScore
 from nova.core.sandbox import SandboxResult, SandboxStatus
 from nova.core.artifact import RichArtifact
+from datetime import datetime, timezone
 
 
 class FakeEmbedder:
@@ -21,6 +22,7 @@ class FakeEmbedder:
             model="nomic-embed-text:v1.5",
             dim=768,
             source_text=text,
+            generated_at=datetime.now(timezone.utc),
         )
 
 

@@ -12,6 +12,17 @@ from unittest.mock import MagicMock
 import pytest
 
 from nova.core.artifact import enrich_artifact, RichArtifact, EmbeddingMetadata
+from datetime import datetime, timezone
+...
+fake_meta = EmbeddingMetadata(
+    vector=[0.1] * 768,
+    dim=768,
+    model="nomic-embed-text:v1.5",
+    source_text="test content",
+    generated_at=datetime.now(timezone.utc),
+    model_blob_sha="sha256:970aa74c0a90",
+)
+
 
 
 def test_no_embedder_back_compat():
@@ -26,6 +37,7 @@ def test_embedder_success_populates_embedding():
         vector=[0.1] * 768,
         dim=768,
         model="nomic-embed-text:v1.5",
+        generated_at=datetime.now(timezone.utc),
         source_text="test content",
         model_blob_sha="sha256:970aa74c0a90",
     )

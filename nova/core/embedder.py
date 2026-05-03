@@ -129,5 +129,5 @@ class NomicEmbedder:
             model=self.model,
             dim=len(vector),
             source_text=source,
-            generated_at=datetime.now(timezone.utc).isoformat(),
+            generated_at=datetime.now(timezone.utc),
         )

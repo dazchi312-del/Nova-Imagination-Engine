@@ -34,6 +34,11 @@ from nova.core.sandbox import execute_sandboxed, SandboxResult, SandboxStatus
 from nova.core.memory import remember  
 from nova.core.artifact import RichArtifact, enrich_artifact, EmbeddingMetadata
 from nova.core.embedder import NomicEmbedder
+from nova.core.schemas import (
+    IterationRecord as IterationRecordV1,
+    Score as ScoreV1,
+    EmbeddingMetadata as EmbeddingMetadataV1,
+)
  
 log = logging.getLogger("nova.loop")
 
@@ -631,12 +636,66 @@ def _safe_remember(kind: str, *, content: str, context: dict) -> None:
 def _write_iteration(exp_dir: Path, rec: IterationRecord) -> None:
     stem = f"iter{rec.iteration:03d}"
     _atomic_write(exp_dir / f"{stem}_code.py", rec.code or "# (no code)")
-    # Full record as JSON (includes timing, stdout, stderr, score, reasoning).
-    # Surgical override: vectors stay in-memory; persisted artifacts omit them.
-    payload = asdict(rec)
-    payload["artifacts"] = [a.to_dict(include_vector=False) for a in rec.artifacts]
-    _atomic_write(exp_dir / f"{stem}_record.json",
-                  json.dumps(payload, indent=2, default=str))
+
+    # --- Translate internal dataclass -> canonical Pydantic v1 record ---
+    score_v1 = None
+    reflector_status = "ok"
+    if rec.score is not None:
+        s = rec.score
+        if (s.elegance is None or s.creative_alignment is None
+                or s.safety_risk is None or s.presence is None):
+            reflector_status = "failed"
+        else:
+            score_v1 = ScoreV1(
+                overall=s.overall,
+                elegance=s.elegance,
+                creative_alignment=s.creative_alignment,
+                safety_risk=s.safety_risk,
+                presence=s.presence,
+                reasoning=s.reasoning or "",
+            )
+
+    embedding_v1 = None
+    if rec.embedding is not None:
+        e = rec.embedding
+        embedding_v1 = EmbeddingMetadataV1(
+            vector=e.vector,
+            model=e.model,
+            dim=e.dim,
+            source_text=e.source_text,
+            generated_at=e.generated_at,
+            model_blob_sha=e.model_blob_sha,
+        )
+
+    artifact_names = [a.name for a in rec.artifacts]
+    status_val = rec.status.value if hasattr(rec.status, "value") else str(rec.status)
+
+    record_v1 = IterationRecordV1(
+        iteration=rec.iteration,
+        started_at=rec.started_at,
+        ended_at=rec.ended_at,
+        status=status_val,
+        hypothesis=rec.hypothesis,
+        critique_applied=rec.critique_applied or "",
+        code=rec.code,
+        code_hash=rec.code_hash,
+        sandbox_status=rec.sandbox_status,
+        sandbox_stdout=rec.sandbox_stdout,
+        sandbox_stderr=rec.sandbox_stderr,
+        sandbox_duration_s=rec.sandbox_duration_s,
+        dreamer_duration_s=rec.dreamer_duration_s,
+        reflector_duration_s=rec.reflector_duration_s,
+        score=score_v1,
+        reflector_status=reflector_status,
+        error=rec.error or "",
+        artifacts=artifact_names,
+        embedding=embedding_v1,
+    )
+
+    _atomic_write(
+        exp_dir / f"{stem}_record.json",
+        record_v1.model_dump_json(indent=2),
+    )
 
 
 def _write_summary(exp_dir: Path, result: ExperimentResult) -> None:

@@ -54,3 +54,9 @@ fontlist-*.json
 .claude/
 experiments/smoke_*/
 *.bak-*
+
+# Build artifacts
+*.egg-info/
+
+# Experiment runtime data (schema validation runs)
+experiments/schema_v1_*/

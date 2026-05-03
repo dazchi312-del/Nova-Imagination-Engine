@@ -10,6 +10,10 @@ if TYPE_CHECKING:
     from nova.core.embedder import NomicEmbedder
 from enum import Enum
 from datetime import datetime
+# EmbeddingMetadata is canonical in nova.core.schemas (Pydantic).
+# Re-exported here for backward-compatible imports.
+from nova.core.schemas import EmbeddingMetadata
+
 
 
 # Embedding model constants
@@ -65,34 +69,6 @@ class StructuralMetadata:
     
     # Generic
     raw: dict[str, Any] = field(default_factory=dict)
-
-
-@dataclass
-class EmbeddingMetadata:
-    """
-    Vector embedding with provenance.
-    
-    Separates the geometric similarity signal (vector) from the
-    taste-alignment signal (resonance_score on RichArtifact).
-    
-    Path B (Phase 9 Block D): source_text is truncated raw content.
-    Future: source_text becomes shape descriptor composition once
-    Block C shape extraction lands.
-    """
-    vector: list[float]                    # the embedding itself
-    model: str                             # e.g., "nomic-embed-text:v1.5"
-    dim: int                               # vector length, asserted on init
-    source_text: str                       # what was fed to the embedder
-    generated_at: datetime = field(default_factory=datetime.now)
-    model_blob_sha: str | None = None  
-
-
-    def __post_init__(self):
-        if len(self.vector) != self.dim:
-            raise ValueError(
-                f"Embedding dim mismatch: declared {self.dim}, "
-                f"got {len(self.vector)}"
-            )
 
 
 @dataclass
