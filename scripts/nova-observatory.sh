@@ -42,7 +42,11 @@ tmux send-keys -t "$SESSION":0.0 \
 tmux split-window -v -l 40% -t "$SESSION":0.0 -c "$NOVA_ROOT"
 tmux send-keys -t "$SESSION":0.1 \
   "while :; do exp=\$(ls -1dt $EXPERIMENTS_ROOT/*/ 2>/dev/null | head -1); \
-   if [[ -n \"\$exp\" ]]; then tail -F \"\$exp\"*.log 2>/dev/null; fi; \
+   if [[ -n \"\$exp\" ]]; then \
+     logs=\$(ls -1t \"\$exp\"*.log 2>/dev/null | head -1); \
+     if [[ -n \"\$logs\" ]]; then tail -F \"\$logs\"; \
+     else echo \"[heartbeat] \$exp — no logs yet\"; fi; \
+   else echo \"[heartbeat] waiting for first experiment...\"; fi; \
    sleep 2; done" C-m
 
 # --- Pane 2 (right): JQ Validator ---
